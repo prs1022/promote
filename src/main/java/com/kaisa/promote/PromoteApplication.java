@@ -240,6 +240,14 @@ public class PromoteApplication implements ApplicationRunner {
             e.printStackTrace();
             throw e;
         }
+        System.out.println(showInfo.toString());
+        showInfo.getLordCollect().forEach(i -> {
+            System.out.println(i);
+        });
+        showInfo.getMoneyCollect().forEach(e -> {
+            System.out.println(e);
+        });
+        System.out.println("===============刷新时间:" + dateFormat.format(new Date()) + "========================");
     }
 
     public static void main(String[] args) {
@@ -256,13 +264,5 @@ public class PromoteApplication implements ApplicationRunner {
         BaseVariable.token = tokenstr;
         token.set(tokenstr);
         run();
-        System.out.println(showInfo.toString());
-        showInfo.getLordCollect().forEach(i -> {
-            System.out.println(i);
-        });
-        showInfo.getMoneyCollect().forEach(e -> {
-            System.out.println(e);
-        });
-        System.out.println("===============刷新时间:" + dateFormat.format(new Date()) + "========================");
     }
 }
