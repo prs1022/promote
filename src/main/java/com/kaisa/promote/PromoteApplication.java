@@ -119,7 +119,7 @@ public class PromoteApplication implements ApplicationRunner {
         Cookie cookie = new Cookie(tokenCookie, tokenWrite);
         cookie.setPath("/");
         response.addCookie(cookie);//写入token
-        run();
+//        run(); //todo 在维护
         if (this.showInfo == null) {
             throw new MyException(ExceptionEnum.SESSION_TIME_OUT);
         }
