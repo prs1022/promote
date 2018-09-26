@@ -8,4 +8,5 @@ public class BaseVariable {
     public static final String baseUrl = "https://dapp.kajsar.com";
     public static int tryTimes = 0;//重试登录次数
     public static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    public static String token;
 }

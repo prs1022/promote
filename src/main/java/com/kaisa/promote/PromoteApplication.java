@@ -178,7 +178,7 @@ public class PromoteApplication implements ApplicationRunner {
         if (!flag) {//不登录是不会执行的
             return;
         }
-        token.set("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjE5NDE2OCwiaXNzIjoiaHR0cHM6Ly9kYXBwLmthanNhci5jb20vYXBpL2F1dGgvbG9naW4iLCJpYXQiOjE1Mzc5Nzg0MzAsImV4cCI6MTU0MDU3MDQzMCwibmJmIjoxNTM3OTc4NDMwLCJqdGkiOiJra1NrUlowRVgybjdKMndrIn0.iZmaYHJkDmSOUHbdBNWIf3WWNl4ShMGdX7sTYL3oshU");
+        token.set(BaseVariable.token);
         if (token.get() == null) {//无效token或者重新登陆一次导致cookie中的token失效
             System.out.println("进入到重登录方法" + dateFormat.format(new Date()));
             //重新触发一次登录 //todo
@@ -250,11 +250,11 @@ public class PromoteApplication implements ApplicationRunner {
     public void run(ApplicationArguments applicationArguments) throws Exception {
         System.out.println("===程序启动时进入====");
         flag = true;
-//        login.setPhoneNum("15251710379");
-//        login.setPwd("prs1022flw");
-//        String tokenstr =login.getToken();
-//        System.out.println("token=>"+tokenstr);
-//        token.set(tokenstr);
+        login.setPhoneNum("15251710379");
+        login.setPwd("prs1022flw");
+        String tokenstr = login.getToken();
+        BaseVariable.token = tokenstr;
+        token.set(tokenstr);
         run();
         System.out.println(showInfo.toString());
         showInfo.getLordCollect().forEach(i -> {
