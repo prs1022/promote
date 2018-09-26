@@ -189,6 +189,9 @@ public class Lord {
         try {
             if (params.size() > 0 && params.get(0).size() > 4) {//需要通过验证码
                 File file = new File("/home/file/kajsar_id_card_" + System.currentTimeMillis() + ".xlsx");
+                if (!file.exists()) {
+                    file.createNewFile();
+                }
                 FileOutputStream fos = new FileOutputStream(file);
                 workbook.write(fos);
             }
