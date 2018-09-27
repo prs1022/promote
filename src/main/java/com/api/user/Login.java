@@ -3,6 +3,8 @@ package com.api.user;
 import com.bean.LoginRs;
 import com.bean.UserInfo;
 import com.cons.BaseVariable;
+import com.exception.ExceptionEnum;
+import com.exception.MyException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -11,7 +13,6 @@ import lombok.Data;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 @Data
 public class Login {
@@ -35,15 +36,19 @@ public class Login {
         params.put("device_id", generateDeviceId());//新增设备号ID,如何生成 01AF7813-FF1F-4CD6-9693-2D3CC5C10081 或16位随机号（估计安卓） 可以用UUID取16位
 
         String response = HttpUtils.doPost(url, params, null);
-        LoginRs res = new Gson().fromJson(response, new TypeToken<LoginRs>() {
-        }.getType());
-        return res.getData().get("token").toString();
+        try {
+            LoginRs res = new Gson().fromJson(response, new TypeToken<LoginRs>() {
+            }.getType());
+            return res.getData().get("token").toString();
+        } catch (Exception e) {
+            throw new MyException(ExceptionEnum.LOGIN_ERROR);
+        }
     }
 
     public String generateDeviceId() {
         StringBuilder sb = new StringBuilder();
         for (char i : phoneNum.toCharArray()) {//已经有11位了
-            sb.append((char)(i+60));
+            sb.append((char) (i + 60));
         }
         //再+5位
         sb.append(phoneNum.charAt(0));

@@ -3,6 +3,8 @@ package com.api.collect;
 import com.bean.Mine;
 import com.bean.MineAccount;
 import com.cons.BaseVariable;
+import com.exception.ExceptionEnum;
+import com.exception.MyException;
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 import com.google.gson.reflect.TypeToken;
@@ -226,9 +228,13 @@ public class Lord {
     public String collectPartition(String token) {
         String url = BaseVariable.baseUrl + "/api/participation/collect";
         String result = HttpUtils.doPost(url, new HashMap(), getTokenHeader(token));
-        Map map = new Gson().fromJson(result, new TypeToken<Map>() {
-        }.getType());
-        return map.get("data").toString();
+        try {
+            Map map = new Gson().fromJson(result, new TypeToken<Map>() {
+            }.getType());
+            return map.get("data").toString();
+        } catch (Exception e) {
+            throw new MyException(ExceptionEnum.FORMAT_ERROR);
+        }
     }
 
     /**

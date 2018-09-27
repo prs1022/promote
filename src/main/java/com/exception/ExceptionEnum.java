@@ -11,7 +11,7 @@ public enum ExceptionEnum {
     UNKONW_ERROR(-1, "未知错误"), SUCCESS(0, "成功"),
 
     LOGIN_ERROR(100, "用户名密码错误"), TIME_OUT(501, "服务端错误"), SESSION_TIME_OUT(101, "登录超时"),
-    THREE_TRY_OUT(101, "三次重试登录次数用完");
+    THREE_TRY_OUT(101, "三次重试登录次数用完"), FORMAT_ERROR(502, "接口格式有误");
     private Integer code;
     private String msg;
 
