@@ -162,9 +162,9 @@ public class Lord {
                 continue;
             }
             redMoneys.add("感谢老铁:" + param.get("owner_name") + "于" + param.get("created_at") + "发的" + getVal("money", response).toString() + "元红包");
-            //休息6秒继续
+            //休息1秒继续
             try {
-                Thread.sleep(6000);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
