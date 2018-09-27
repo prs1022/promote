@@ -1,11 +1,13 @@
 package com.kaisa.promote;
 
+import ch.qos.logback.classic.Logger;
 import com.api.collect.Lord;
 import com.api.user.Login;
 import com.bean.*;
 import com.cons.BaseVariable;
 import com.exception.ExceptionEnum;
 import com.exception.MyException;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
@@ -36,7 +38,7 @@ import java.util.*;
 @Scope("prototype")
 public class PromoteApplication implements ApplicationRunner {
 
-    private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//24小时
 
     private Login login = new Login();//登录的时候，同步
 
@@ -51,6 +53,8 @@ public class PromoteApplication implements ApplicationRunner {
     private String pwdCookie = "pwd_cookie";
 
     private Map<String, String> uNamePwd = new HashMap();//key->手机号,val->pwd
+    
+    private org.slf4j.Logger logger = LoggerFactory.getLogger(PromoteApplication.class);
 
     @GetMapping("/login")
     String loginForm(Model model) {
@@ -125,7 +129,7 @@ public class PromoteApplication implements ApplicationRunner {
             MineAccount.MineAccountData accountData = lord.mineAccount(token.get()).getData();
             if (accountData == null) {
                 token.remove();
-                System.err.println("accountData获取为null，token失效");
+                logger.error("accountData获取为null，token失效");
                 throw new MyException(ExceptionEnum.SESSION_TIME_OUT);
             }
             showInfo.setCapacity(accountData.getCapacity());
@@ -152,7 +156,7 @@ public class PromoteApplication implements ApplicationRunner {
             if (e instanceof MyException) {
                 throw e;
             }
-            System.err.println("login to result ERROR=>" + e.getMessage());
+            logger.error("login to result ERROR=>" + e.getMessage());
             throw new MyException(ExceptionEnum.TIME_OUT);
         }
         if (this.showInfo == null) {
@@ -183,7 +187,7 @@ public class PromoteApplication implements ApplicationRunner {
     @Scheduled(cron = "0 0 1 * * *")
     public void loginEveryday() {
         login();
-        System.out.println("每次定时登录成功!!");
+        logger.info("每次定时登录成功!!");
     }
 */
 
@@ -198,12 +202,12 @@ public class PromoteApplication implements ApplicationRunner {
             flag = true;
         } catch (Exception e) {
             flag = false;
-            System.err.println("登录失败，uName:" + login.getPhoneNum());
+            logger.error("登录失败，uName:" + login.getPhoneNum());
             throw new MyException(ExceptionEnum.LOGIN_ERROR);
         }
         showInfo.getLordCollect().clear();
-        System.out.println(login.getPhoneNum() + "登陆了！！token:" + token.get());
-//        System.out.println("领取分红:" + new Lord().collectPartition(token.get()));
+        logger.info(login.getPhoneNum() + "登陆了！！token:" + token.get());
+//        logger.info("领取分红:" + new Lord().collectPartition(token.get()));
         return token.get();
     }
 
@@ -215,7 +219,7 @@ public class PromoteApplication implements ApplicationRunner {
         }
         token.set(BaseVariable.token);
         if (token.get() == null) {//无效token或者重新登陆一次导致cookie中的token失效
-            System.out.println("进入到重登录方法" + dateFormat.format(BaseVariable.getCurrentTime()));
+            logger.info("进入到重登录方法" + dateFormat.format(BaseVariable.getCurrentTime()));
             //重新触发一次登录 //todo
             if (BaseVariable.tryTimes > 2) {
                 //尝试三次以上就不登录了
@@ -223,12 +227,12 @@ public class PromoteApplication implements ApplicationRunner {
             }
             String tokenStr = login();
             if (tokenStr == null) {
-                System.err.println("第" + (BaseVariable.tryTimes) + "次重试失败!");
+                logger.error("第" + (BaseVariable.tryTimes) + "次重试失败!");
                 return;
             }
             BaseVariable.tryTimes++;
         }
-        System.out.println("十分钟刷新一次----tryTIme:" + BaseVariable.tryTimes + ",phone:" + login.getPhoneNum() + ",刷新时间:" + dateFormat.format(BaseVariable.getCurrentTime()) + ",token:" + token.get());
+        logger.info("十分钟刷新一次----tryTIme:" + BaseVariable.tryTimes + ",phone:" + login.getPhoneNum() + ",刷新时间:" + dateFormat.format(BaseVariable.getCurrentTime()) + ",token:" + token.get());
         BaseVariable.tryTimes = 0;//登录成功置trytime = 0
         try {
             UserInfo.UserData userData = null;
@@ -236,14 +240,14 @@ public class PromoteApplication implements ApplicationRunner {
                 userData = login.userInfo(token.get()).getData();
             } catch (Exception e) {
                 token.remove();//如果token失效，则当天重新登录一次获取
-                System.err.println("登录失败，再接再厉...");
+                logger.error("登录失败，再接再厉...");
                 throw new MyException(ExceptionEnum.LOGIN_ERROR);
             }
             Lord lord = new Lord();
             MineAccount.MineAccountData accountData = lord.mineAccount(token.get()).getData();
             if (accountData == null) {
                 token.remove();
-                System.err.println("token失效");
+                logger.error("token失效");
                 throw new MyException(ExceptionEnum.SESSION_TIME_OUT);
             }
             showInfo.setCapacity(accountData.getCapacity());
@@ -275,19 +279,19 @@ public class PromoteApplication implements ApplicationRunner {
             e.printStackTrace();
             throw e;
         } finally {
-            System.out.println("\n" + showInfo.toString());
+            logger.info("\n" + showInfo.toString());
             showInfo.getLordCollect().forEach(i -> {
-                System.out.println(i);
+                logger.info(i);
             });
             showInfo.getMoneyCollect().forEach(e -> {
-                System.out.println(e);
+                logger.info(e);
                 try {
                     Thread.sleep(300);
                 } catch (InterruptedException e1) {
                     e1.printStackTrace();
                 }
             });
-            System.out.println("===============刷新时间:" + dateFormat.format(BaseVariable.getCurrentTime()) + "========================");
+            logger.info("===============刷新时间:" + dateFormat.format(BaseVariable.getCurrentTime()) + "========================");
         }
     }
 
@@ -297,7 +301,7 @@ public class PromoteApplication implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments applicationArguments) throws Exception {
-        System.out.println("===程序启动时进入====");
+        logger.info("===程序启动时进入====");
         flag = true;
         login.setPhoneNum("15251710379");
         login.setPwd("prs1022flw");

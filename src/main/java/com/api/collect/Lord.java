@@ -1,5 +1,6 @@
 package com.api.collect;
 
+import ch.qos.logback.classic.Logger;
 import com.bean.Mine;
 import com.bean.MineAccount;
 import com.cons.BaseVariable;
@@ -14,6 +15,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -28,6 +30,8 @@ import static java.util.stream.Collectors.toList;
  */
 public class Lord {
 
+
+    private org.slf4j.Logger logger = LoggerFactory.getLogger(Lord.class);
 
     /**
      * 收集lord
@@ -92,7 +96,7 @@ public class Lord {
         Map params = new HashMap();
         String lng = randomLatLng()[0];
         String lat = randomLatLng()[1];
-        System.out.println("随机经纬度:" + lng + " E," + lat + " N");
+        logger.info("随机经纬度:" + lng + " E," + lat + " N");
         params.put("lat", lat);
         params.put("lng", lng);
         String response = HttpUtils.doPost(BaseVariable.baseUrl2 + "/api/envelope/by/lbs", params, getTokenHeader(token));
@@ -100,7 +104,7 @@ public class Lord {
         List<Map> elsList = new Gson().fromJson(new Gson().toJson(els), new TypeToken<List<Map>>() {
         }.getType());
         if (elsList == null || elsList.size() == 0) {
-            System.err.println("初始化红包地图页面失败!!");
+            logger.error("初始化红包地图页面失败!!");
             return Collections.emptyList();
         }
         List<Map<String, String>> askList = new ArrayList<>();
@@ -157,11 +161,11 @@ public class Lord {
                 Map resMap = new Gson().fromJson(response, new TypeToken<Map>() {
                 }.getType());
                 if (!resMap.get("code").toString().replace(".0", "").equals("0")) {
-                    System.out.println(resMap.get("data") == null ? null : resMap.get("data").toString());
+                    logger.info(resMap.get("data") == null ? null : resMap.get("data").toString());
                     continue;
                 }
             } catch (Exception e) {
-                System.err.println("红包已经被抢过了!,经度:" + param.get("lng") + ",纬度:" + param.get("lat"));
+                logger.error("红包已经被抢过了!,经度:" + param.get("lng") + ",纬度:" + param.get("lat"));
                 continue;
             }
             redMoneys.add("感谢老铁:" + param.get("owner_name") + "于" + param.get("created_at") + "发的" + getVal("money", response).toString() + "元红包");

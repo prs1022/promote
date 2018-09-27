@@ -5,6 +5,8 @@ import ch.ethz.ssh2.Connection;
 import ch.ethz.ssh2.Session;
 import ch.ethz.ssh2.StreamGobbler;
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,6 +18,9 @@ import java.util.Map;
  * 执行shell脚本类
  */
 public class RemoteShellExecutor {
+
+
+    private static Logger logger = LoggerFactory.getLogger(RemoteShellExecutor.class);
 
     private Connection conn;
     /**
@@ -131,7 +136,7 @@ public class RemoteShellExecutor {
         // 执行myTest.sh 参数为java Know dummy// service supervisor restart//supervisorctl status
         Map<String, Object> res = executor.exec("tail -100 /home/log.txt");
         for (String kk : res.keySet()) {
-            System.out.println(res.get(kk));
+            logger.info("{}", res.get(kk));
         }
     }
 

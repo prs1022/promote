@@ -10,6 +10,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.util.HttpUtils;
 import lombok.Data;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,6 +22,8 @@ public class Login {
     private String phoneNum;
 
     private String pwd;
+
+    private org.slf4j.Logger logger = LoggerFactory.getLogger(Login.class);
 
     /**
      * 获取token
@@ -56,7 +59,7 @@ public class Login {
         sb.append(phoneNum.charAt(5));
         sb.append(phoneNum.charAt(7));
         sb.append(phoneNum.charAt(9));
-        System.out.println("设备号:" + sb.toString());
+        logger.info("设备号:" + sb.toString());
         return sb.toString();
     }
 
