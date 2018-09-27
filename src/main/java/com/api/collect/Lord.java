@@ -17,10 +17,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static java.util.stream.Collectors.toList;
 
@@ -101,7 +98,8 @@ public class Lord {
         List<Map> elsList = new Gson().fromJson(new Gson().toJson(els), new TypeToken<List<Map>>() {
         }.getType());
         if (elsList == null || elsList.size() == 0) {
-            throw new RuntimeException("初始化红包地图页面失败!!");
+            System.err.println("初始化红包地图页面失败!!");
+            return Collections.emptyList();
         }
         List<Map<String, String>> askList = new ArrayList<>();
         for (Map data : elsList) {
@@ -141,6 +139,9 @@ public class Lord {
     public List<String> collectRedPacket(String token) {
         List<String> redMoneys = new ArrayList<>();
         List<Map<String, String>> params = getRedPacketParams(token);
+        if (params == null || params.size() == 0) {
+            return Arrays.asList(new String[]{"暂无红包可以领取"});
+        }
         for (Map<String, String> param : params) {
             HashMap requestParam = new HashMap();
 //            requestParam.put("lat", param.get("lat"));
