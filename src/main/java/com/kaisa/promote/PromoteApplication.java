@@ -113,40 +113,45 @@ public class PromoteApplication implements ApplicationRunner {
                 }
             }
         }
-        login.setPhoneNum(phoneNum);
-        login.setPwd(pwd);
-        String tokenWrite = login();//登录
-        Cookie cookie = new Cookie(tokenCookie, tokenWrite);
-        cookie.setPath("/");
-        response.addCookie(cookie);//写入token
-        UserInfo.UserData userData = login.userInfo(token.get()).getData();
-        Lord lord = new Lord();
-        MineAccount.MineAccountData accountData = lord.mineAccount(token.get()).getData();
-        if (accountData == null) {
-            token.remove();
-            System.err.println("accountData获取为null，token失效");
-            throw new MyException(ExceptionEnum.SESSION_TIME_OUT);
-        }
-        showInfo.setCapacity(accountData.getCapacity());
-        showInfo.setInviteCode(userData.getInvite_code());
-        showInfo.setInviteNum(login.getInviteUserNum(token.get()));
-        showInfo.setIp(userData.getIp());
-        showInfo.setLordCount(accountData.getCredit());
-        showInfo.setMoneyLeft(login.getMoney(token.get()));
-        String realName = userData.getReal_name();
-        showInfo.setRealName(realName.substring(0, 1) + "*" + ((realName.length() == 2) ? "" : "*"));
-        showInfo.setRefresh("刷新时间:" + dateFormat.format(BaseVariable.getCurrentTime()));
+       try{
+           login.setPhoneNum(phoneNum);
+           login.setPwd(pwd);
+           String tokenWrite = login();//登录
+           Cookie cookie = new Cookie(tokenCookie, tokenWrite);
+           cookie.setPath("/");
+           response.addCookie(cookie);//写入token
+           UserInfo.UserData userData = login.userInfo(token.get()).getData();
+           Lord lord = new Lord();
+           MineAccount.MineAccountData accountData = lord.mineAccount(token.get()).getData();
+           if (accountData == null) {
+               token.remove();
+               System.err.println("accountData获取为null，token失效");
+               throw new MyException(ExceptionEnum.SESSION_TIME_OUT);
+           }
+           showInfo.setCapacity(accountData.getCapacity());
+           showInfo.setInviteCode(userData.getInvite_code());
+           showInfo.setInviteNum(login.getInviteUserNum(token.get()));
+           showInfo.setIp(userData.getIp());
+           showInfo.setLordCount(accountData.getCredit());
+           showInfo.setMoneyLeft(login.getMoney(token.get()));
+           String realName = userData.getReal_name();
+           showInfo.setRealName(realName.substring(0, 1) + "*" + ((realName.length() == 2) ? "" : "*"));
+           showInfo.setRefresh("刷新时间:" + dateFormat.format(BaseVariable.getCurrentTime()));
 //            showInfo.setPartition(lord.partitionInfo(token.get()).get("total"));
-        //收取lord
-        for (Mine.MineItem mineItem : lord.mines(token.get()).getData().getMines()) {
-            lord.collect(mineItem.getKey(), token.get());//收集
-            showInfo.getLordCollect().add("大吉大利,喜提lord:" + mineItem.getCredit() + ",    产出时间:" + dateFormat.format(new Date(mineItem.getTime() * 1000)));
-        }
+           //收取lord
+           for (Mine.MineItem mineItem : lord.mines(token.get()).getData().getMines()) {
+               lord.collect(mineItem.getKey(), token.get());//收集
+               showInfo.getLordCollect().add("大吉大利,喜提lord:" + mineItem.getCredit() + ",    产出时间:" + dateFormat.format(new Date(mineItem.getTime() * 1000)));
+           }
 
-        //收取附近的红包
-        lord.collectRedPacket(token.get()).forEach(e -> {
-            showInfo.getMoneyCollect().add("收取附近的红包，" + e);
-        });
+           //收取附近的红包
+           lord.collectRedPacket(token.get()).forEach(e -> {
+               showInfo.getMoneyCollect().add("收取附近的红包，" + e);
+           });
+       }catch (Exception e){
+           System.err.println("login to result ERROR=>"+e.getMessage());
+           throw new MyException(ExceptionEnum.TIME_OUT);
+       }
         if (this.showInfo == null) {
             throw new MyException(ExceptionEnum.SESSION_TIME_OUT);
         }
