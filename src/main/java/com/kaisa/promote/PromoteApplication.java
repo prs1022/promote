@@ -180,7 +180,7 @@ public class PromoteApplication implements ApplicationRunner {
         }
         token.set(BaseVariable.token);
         if (token.get() == null) {//无效token或者重新登陆一次导致cookie中的token失效
-            System.out.println("进入到重登录方法" + dateFormat.format(new Date()));
+            System.out.println("进入到重登录方法" + dateFormat.format(BaseVariable.getCurrentTime()));
             //重新触发一次登录 //todo
             if (BaseVariable.tryTimes > 2) {
                 //尝试三次以上就不登录了
@@ -193,7 +193,7 @@ public class PromoteApplication implements ApplicationRunner {
             }
             BaseVariable.tryTimes++;
         }
-        System.out.println("十分钟刷新一次----tryTIme:" + BaseVariable.tryTimes + ",phone:" + login.getPhoneNum() + ",刷新时间:" + dateFormat.format(Calendar.getInstance().getTime()) + ",token:" + token.get());
+        System.out.println("十分钟刷新一次----tryTIme:" + BaseVariable.tryTimes + ",phone:" + login.getPhoneNum() + ",刷新时间:" + dateFormat.format(BaseVariable.getCurrentTime()) + ",token:" + token.get());
         BaseVariable.tryTimes = 0;//登录成功置trytime = 0
         try {
             UserInfo.UserData userData = null;
@@ -239,15 +239,21 @@ public class PromoteApplication implements ApplicationRunner {
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
+        } finally {
+            System.out.println(showInfo.toString());
+            showInfo.getLordCollect().forEach(i -> {
+                System.out.println(i);
+            });
+            showInfo.getMoneyCollect().forEach(e -> {
+                System.out.println(e);
+                try {
+                    Thread.sleep(300);
+                } catch (InterruptedException e1) {
+                    e1.printStackTrace();
+                }
+            });
+            System.out.println("===============刷新时间:" + dateFormat.format(BaseVariable.getCurrentTime()) + "========================");
         }
-        System.out.println(showInfo.toString());
-        showInfo.getLordCollect().forEach(i -> {
-            System.out.println(i);
-        });
-        showInfo.getMoneyCollect().forEach(e -> {
-            System.out.println(e);
-        });
-        System.out.println("===============刷新时间:" + dateFormat.format(new Date()) + "========================");
     }
 
     public static void main(String[] args) {

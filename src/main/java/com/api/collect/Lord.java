@@ -100,7 +100,7 @@ public class Lord {
         Object els = getVal("els", response);
         List<Map> elsList = new Gson().fromJson(new Gson().toJson(els), new TypeToken<List<Map>>() {
         }.getType());
-        if (elsList.size() == 0) {
+        if (elsList == null || elsList.size() == 0) {
             throw new RuntimeException("初始化红包地图页面失败!!");
         }
         List<Map<String, String>> askList = new ArrayList<>();
